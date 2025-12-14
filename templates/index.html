@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Синяя верхняя полоса -->
+    <div class="top-bar">
+        <div class="logo">
+            <i class="fas fa-database"></i>
+            <span>Text2SQL</span>
+        </div>
+    </div>
+
+    <!-- Основная сетка -->
+    <div class="container">
+        <!-- Левая панель: История запросов -->
+        <div class="side-panel">
+            <h2><i class="fas fa-history"></i> История запросов</h2>
+            <div class="history-list" id="historyList">
+                {% for query in query_history %}
+                <div class="history-item" onclick="useHistoryQuery('{{ query }}')">
+                    <i class="fas fa-search"></i> {{ query }}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="samples-section">
+                <h3><i class="fas fa-lightbulb"></i> Примеры запросов</h3>
+                <div id="sampleQueries"></div>
+            </div>
+        </div>
+
+        <!-- Центральная часть -->
+        <div class="center-panel">
+            <!-- Пользовательский запрос -->
+            <div class="query-section">
+                <h2><i class="fas fa-comment-dots"></i> Пользовательский запрос</h2>
+                <div class="query-input-container">
+                    <input type="text" id="userQuery" 
+                           placeholder="Введите запрос на естественном языке. Пример: 'Покажи всех сотрудников из IT отдела с зарплатой выше 100000'"
+                           onkeypress="handleKeyPress(event)">
+                    <button onclick="processQuery()" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i> Выполнить
+                    </button>
+                </div>
+                <div class="quick-actions">
+                    <button onclick="clearQuery()" class="btn-secondary">
+                        <i class="fas fa-eraser"></i> Очистить поле
+                    </button>
+                    <button onclick="showExamples()" class="btn-secondary">
+                        <i class="fas fa-magic"></i> Показать примеры
+                    </button>
+                    <button onclick="clearHistory()" class="btn-secondary">
+                        <i class="fas fa-trash-alt"></i> Очистить историю
+                    </button>
+                </div>
+                
+                <!-- Сообщения об ошибках/загрузке -->
+                <div id="loading" class="loading" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i> Обработка запроса LLM...
+                </div>
+                <div id="error" class="error" style="display: none;"></div>
+            </div>
+
+            <!-- Результаты -->
+            <div class="results-section">
+                <h2><i class="fas fa-table"></i> Результаты запроса</h2>
+                <div class="results-container" id="resultsContainer">
+                    <div id="resultsTable" class="results-table">
+                        <p class="placeholder">Здесь появятся результаты вашего SQL-запроса</p>
+                    </div>
+                </div>
+                
+                <!-- Кнопки экспорта -->
+                <div class="export-buttons">
+                    <button onclick="exportToCSV()" class="btn-export csv">
+                        <i class="fas fa-file-csv"></i> Экспорт в CSV
+                    </button>
+                    <button onclick="exportToPDF()" class="btn-export">
+                        <i class="fas fa-file-pdf"></i> Экспорт в PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая панель: SQL запрос -->
+        <div class="side-panel sql-panel">
+            <h2><i class="fas fa-code"></i> Сгенерированный SQL-запрос</h2>
+            
+            <div class="sql-container">
+                <pre id="sqlQuery" class="sql-code">-- SQL-запрос появится здесь после обработки</pre>
+                <div class="sql-controls">
+                    <button onclick="copySQL()" class="btn-copy" id="copySqlBtn">
+                        <i class="fas fa-copy"></i> Копировать SQL
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Статистика выполнения -->
+            <div class="execution-info">
+                <h3><i class="fas fa-chart-line"></i> Статистика выполнения</h3>
+                <p id="executionTime"><i class="fas fa-clock"></i> Время выполнения: --</p>
+                <p id="rowCount"><i class="fas fa-chart-bar"></i> Найдено записей: --</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Футер -->
+    <footer class="footer">
+        <p>Курсовая работа: Система преобразования естественного языка в SQL-запросы с использованием LLM</p>
+        <p>Группа ИТ-406 | Бахарев В.М.</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
