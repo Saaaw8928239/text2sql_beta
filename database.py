@@ -1,7 +1,6 @@
 import psycopg2
 from psycopg2 import sql, DatabaseError
 from config import config
-import pandas as pd
 
 class Database:
     def __init__(self):
@@ -9,7 +8,7 @@ class Database:
         self.cursor = None
         
     def connect(self):
-        #Установка соединения с БД
+        """Установка соединения с БД PostgreSQL"""
         try:
             self.connection = psycopg2.connect(
                 host=config.DB_HOST,
@@ -19,22 +18,22 @@ class Database:
                 password=config.DB_PASSWORD
             )
             self.cursor = self.connection.cursor()
-            print("Подключение к БД установлено успешно!")
+            print("✅ Подключение к PostgreSQL установлено успешно.")
             return True
         except Exception as e:
-            print(f"Ошибка подключения к БД: {e}")
+            print(f"❌ Ошибка подключения к БД: {e}")
             return False
     
     def disconnect(self):
-        #Закрытие соединения с БД
+        """Закрытие соединения с БД"""
         if self.cursor:
             self.cursor.close()
         if self.connection:
             self.connection.close()
-        print("Соединение с БД закрыто.")
+        print("🔌 Соединение с БД закрыто.")
     
     def execute_query(self, query, params=None, fetch=True):
-        #Выполнение SQL-запроса с параметрами
+        """Выполнение SQL-запроса с возвратом данных и имен колонок"""
         try:
             if params:
                 self.cursor.execute(query, params)
@@ -42,14 +41,14 @@ class Database:
                 self.cursor.execute(query)
             
             if fetch:
-                if query.strip().upper().startswith('SELECT'):
-                    # Для SELECT возвращаем результат
+                # Проверяем, является ли запрос выборкой данных
+                upper_query = query.strip().upper()
+                if upper_query.startswith('SELECT') or upper_query.startswith('WITH'):
+                    # Извлекаем имена колонок для корректного отображения в таблице на фронтенде
                     columns = [desc[0] for desc in self.cursor.description]
                     results = self.cursor.fetchall()
-                    self.connection.commit()
                     return results, columns
                 else:
-                    # Для INSERT/UPDATE/DELETE
                     self.connection.commit()
                     return self.cursor.rowcount, None
             else:
@@ -57,12 +56,13 @@ class Database:
                 return None, None
                 
         except DatabaseError as e:
-            self.connection.rollback()
-            print(f"Ошибка выполнения запроса: {e}")
+            if self.connection:
+                self.connection.rollback()
+            print(f"❌ Ошибка выполнения запроса: {e}")
             raise e
     
-    def get_table_structure(self, table_name='employees'):
-        #Получение структуры таблицы (метаданные)
+    def get_table_structure(self, table_name):
+        """Получение структуры конкретной таблицы (колонки, типы данных)"""
         query = """
         SELECT column_name, data_type, is_nullable
         FROM information_schema.columns
@@ -71,22 +71,44 @@ class Database:
         """
         self.cursor.execute(query, (table_name,))
         return self.cursor.fetchall()
-    
-    def get_sample_data(self, table_name='employees', limit=5):
-        #Получение примеров данных из таблицы
-        query = sql.SQL("SELECT * FROM {} LIMIT %s").format(sql.Identifier(table_name))
-        return self.execute_query(query, (limit,))
 
-# Создаем глобальный экземпляр для использования во всем приложении
+    def get_all_tables_metadata(self):
+        """
+        Получение метаданных всех таблиц HR-системы.
+        Используется для формирования контекста (промпта) нейросети.
+        """
+        query = """
+        SELECT table_name, column_name, data_type 
+        FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name IN (
+            'employees', 'departments', 'positions', 'employment_history', 
+            'vacations', 'bonuses', 'trainings', 'employee_trainings', 
+            'projects', 'project_assignments', 'performance_reviews', 'job_openings'
+        )
+        ORDER BY table_name, ordinal_position;
+        """
+        results, _ = self.execute_query(query)
+        return results
+
+# Создаем глобальный экземпляр для использования в приложении
 db = Database()
 
 def init_db():
-    #Инициализация БД при запуске приложения
+    """Инициализация БД при запуске приложения"""
     if db.connect():
-        # Получаем структуру таблицы для NLP-модуля
-        structure = db.get_table_structure()
-        print("Структура таблицы employees:")
-        for col in structure:
-            print(f"  - {col[0]}: {col[1]} ({'NULL' if col[2] == 'YES' else 'NOT NULL'})")
-        return True
+        try:
+            # Проверка наличия таблиц в схеме
+            tables_query = """
+                SELECT count(*) 
+                FROM information_schema.tables 
+                WHERE table_schema = 'public';
+            """
+            result, _ = db.execute_query(tables_query)
+            table_count = result[0][0]
+            print(f"📊 В схеме 'public' обнаружено таблиц: {table_count}")
+            return True
+        except Exception as e:
+            print(f"⚠️ Ошибка при проверке таблиц: {e}")
+            return True # Все равно возвращаем True, если соединение есть
     return False

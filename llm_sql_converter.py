@@ -1,216 +1,123 @@
-# llm_sql_converter.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
 import re
 import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 
 class LLMSQLConverter:
-    def __init__(self, model_name="distilgpt2"):
-        """
-        Используем модель для Text-to-SQL
-        """
-        print(f"🔄 Загрузка модели {model_name}...")
-        
-        self.model = None
-        self.tokenizer = None
+    def __init__(self, model_name="Qwen/Qwen2.5-3B-Instruct"):
+        print(f"🔄 Загрузка модели {model_name} для новой схемы БД...")
+
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        print(f"   Устройство: {self.device}")
-        
-        # Пробуем загрузить модель
+        self.model_loaded = False
+
+        # Описание схемы на русском, чтобы модель лучше сопоставляла понятия
+        self.database_schema = """
+        Таблицы и колонки в PostgreSQL:
+        1. employees (Сотрудники): id, first_name (имя), last_name (фамилия), patronymic (отчество), birth_date, gender (пол: 'Мужской', 'Женский'), email, phone, hire_date, termination_date, is_active, department_id, position_id, manager_id, salary (оклад), bonus_percent
+        2. departments (Отделы): id, department_name (название отдела), department_code, head_of_department_id, budget, location, phone, parent_department_id
+        3. positions (Должности): id, position_name (название), position_level (Junior, Middle, Senior, Lead, Head), category, min_salary, max_salary, required_experience_years
+        4. employment_history: id, employee_id, position_id, department_id, salary, start_date, end_date, change_reason
+        5. vacations (Отпуска): id, employee_id, vacation_type, start_date, end_date, status, approved_by
+        6. bonuses (Премии): id, employee_id, bonus_amount, bonus_date, bonus_reason, quarter (квартал), year (год)
+        7. trainings (Обучение): id, training_name, training_type, start_date, end_date, cost, provider
+        8. employee_trainings: id, employee_id, training_id, completion_date, grade, certificate_received
+        9. projects (Проекты): id, project_name, project_manager_id, department_id, start_date, end_date, status, budget
+        10. project_assignments: id, employee_id, project_id, role, hours_allocated, assignment_date, completion_percentage
+        11. performance_reviews: id, employee_id, reviewer_id, review_date, rating, comments, goals
+        12. job_openings (Вакансии): id, position_id, department_id, opening_date, status, salary_range_min, salary_range_max
+
+        Важные связи:
+        - employees.department_id = departments.id
+        - employees.position_id = positions.id
+        - vacations.employee_id = employees.id
+        - bonuses.employee_id = employees.id
+        - project_assignments.employee_id = employees.id
+        """
+
         try:
-            from transformers import AutoTokenizer, AutoModelForCausalLM
-            
-            # ПРОСТАЯ загрузка без сложных параметров
+            quantization_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_quant_type="nf4",
+                bnb_4bit_compute_dtype=torch.float16,
+                bnb_4bit_use_double_quant=True,
+            )
+
             self.tokenizer = AutoTokenizer.from_pretrained(model_name)
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_name,
-                torch_dtype=torch.float16,
-                device_map="auto" if self.device == "cuda" else None,
-                local_files_only=True 
+                quantization_config=quantization_config,
+                device_map="auto",
+                trust_remote_code=True,
             )
-            
-            if self.device == "cpu":
-                self.model = self.model.to(self.device)
-            
-            print("✅ Модель успешно загружена!")
             self.model_loaded = True
-            
+            print(f"✅ Модель загружена. VRAM: {self.model.get_memory_footprint() / 1024**3:.2f} GB")
+
         except Exception as e:
-            print(f"❌ Не удалось загрузить модель: {e}")
-            print("   Использую улучшенный fallback")
-            self.model_loaded = False
-        
-        # Контекст базы данных
-        self.db_schema = """
-        База данных "company_db", таблица "employees":
-        
-        Столбцы:
-        - id (INTEGER, PRIMARY KEY, AUTOINCREMENT)
-        - first_name (VARCHAR(50), NOT NULL) - имя
-        - last_name (VARCHAR(50), NOT NULL) - фамилия  
-        - patronymic (VARCHAR(50)) - отчество
-        - department (VARCHAR(100), NOT NULL) - отдел: 'IT', 'Маркетинг', 'Финансы', 'Продажи', 'HR', 'Логистика', 'Закупки', 'Руководство'
-        - position (VARCHAR(100), NOT NULL) - должность
-        - salary (DECIMAL(10,2)) - зарплата в рублях
-        - hire_date (DATE) - дата приема
-        - email (VARCHAR(100)) - email
-        
-        Важно: Для поиска по отделу используй department = 'Название_отдела'.
-        Для зарплаты используй salary >, <, =.
-        """
-    
-    def _fallback_sql(self, query):
-        """УЛУЧШЕННЫЙ fallback - теперь понимает зарплату!"""
-        import re
-        query_lower = query.lower()
-        
-        # Извлекаем число
-        numbers = re.findall(r'\d+', query)
-        amount = numbers[0] if numbers else None
-        
-        # Определяем оператор
-        operator = None
-        if "больше" in query_lower or "выше" in query_lower or "свыше" in query_lower:
-            operator = ">"
-        elif "меньше" in query_lower or "ниже" in query_lower or "менее" in query_lower:
-            operator = "<"
-        elif "равно" in query_lower or "равен" in query_lower:
-            operator = "="
-        elif "от" in query_lower and "до" in query_lower:
-            # Обработка диапазона "от X до Y"
-            if numbers and len(numbers) >= 2:
-                return f"SELECT first_name, last_name, position, department, salary FROM employees WHERE salary BETWEEN {numbers[0]} AND {numbers[1]};"
-        
-        # Основная логика
-        base_select = "SELECT first_name, last_name, position, department, salary"
-        
-        if "все" in query_lower and "сотрудник" in query_lower:
-            if amount and operator:
-                # "всех сотрудников с зарплатой меньше 150000"
-                return f"{base_select} FROM employees WHERE salary {operator} {amount};"
-            else:
-                return "SELECT * FROM employees;"
-        
-        elif "зарплат" in query_lower or "оклад" in query_lower or "доход" in query_lower:
-            if amount and operator:
-                return f"{base_select} FROM employees WHERE salary {operator} {amount};"
-            elif "средн" in query_lower:
-                return "SELECT AVG(salary) as avg_salary FROM employees;"
-            else:
-                return f"{base_select} FROM employees ORDER BY salary DESC LIMIT 10;"
-        
-        elif "ит" in query_lower or "it" in query_lower:
-            if amount and operator and "зарплат" in query_lower:
-                # "ит с зарплатой больше X"
-                return f"{base_select} FROM employees WHERE department = 'IT' AND salary {operator} {amount};"
-            else:
-                return f"{base_select} FROM employees WHERE department = 'IT';"
-        
-        elif "менеджер" in query_lower:
-            if amount and operator and "зарплат" in query_lower:
-                return f"{base_select} FROM employees WHERE position ILIKE '%менеджер%' AND salary {operator} {amount};"
-            else:
-                return f"{base_select} FROM employees WHERE position ILIKE '%менеджер%';"
-        
-        elif "сортир" in query_lower or "упорядоч" in query_lower:
-            if "зарплат" in query_lower:
-                direction = "DESC" if "убыван" in query_lower else "ASC"
-                return f"{base_select} FROM employees ORDER BY salary {direction};"
-            elif "фамили" in query_lower:
-                return f"{base_select} FROM employees ORDER BY last_name ASC;"
-        
-        elif "сколько" in query_lower or "количеств" in query_lower:
-            if "ит" in query_lower:
-                return "SELECT COUNT(*) as count FROM employees WHERE department = 'IT';"
-            elif "менеджер" in query_lower:
-                return "SELECT COUNT(*) as count FROM employees WHERE position ILIKE '%менеджер%';"
-            else:
-                return "SELECT COUNT(*) as count FROM employees;"
-        
-        # Если ничего не подошло - возвращаем ограниченный набор
-        return "SELECT first_name, last_name, position, department, salary FROM employees LIMIT 10;"
-    
-    def generate_sql_with_llm(self, query):
-        """Генерация SQL через настоящую LLM"""
-        try:
-            prompt = f"""
-            Преобразуй запрос на русском в SQL.
-            
-            Схема БД: {self.db_schema}
-            
-            Запрос: {query}
-            
-            SQL (только запрос, без объяснений):
-            """
-            
-            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=1024)
-            inputs = inputs.to(self.device)
-            
-            with torch.no_grad():
-                outputs = self.model.generate(
-                    **inputs,
-                    max_new_tokens=200,
-                    temperature=0.1,
-                    do_sample=False,
-                    pad_token_id=self.tokenizer.eos_token_id
-                )
-            
-            sql = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-            
-            # Извлекаем SQL из ответа
-            if "SQL" in sql:
-                sql = sql.split("SQL")[-1].strip()
-            
-            # Очищаем
-            sql = re.sub(r'```sql|```', '', sql).strip()
-            if not sql.endswith(';'):
-                sql += ';'
-                
-            return sql
-            
-        except Exception as e:
-            print(f"   ⚠️  Ошибка LLM генерации: {e}")
+            print(f"❌ Ошибка загрузки модели: {e}")
+
+    def generate_sql_with_llm(self, user_query):
+        """Генерация SQL на основе русского промпта"""
+        if not self.model_loaded:
             return None
-    
-    def convert(self, query):
-        """Основной метод конвертации"""
-        try:
-            print(f"\n{'='*60}")
-            print(f"🤖 Обработка: '{query}'")
+
+        # Промпт полностью на русском для лучшего понимания кириллицы
+        prompt = f"""Ты — эксперт по SQL. Твоя задача: перевести запрос пользователя на естественном языке в корректный SQL-запрос для PostgreSQL.
+
+        СХЕМА БАЗЫ ДАННЫХ:
+        {self.database_schema}
+
+        ПРАВИЛА:
+        1. Используй только указанные таблицы и колонки.
+        2. Для текстового поиска используй оператор ILIKE (например, department_name ILIKE '%IT%').
+        3. Если нужно название отдела или должности, обязательно делай JOIN с соответствующей таблицей.
+        4. Если в запросе есть упоминание имен, фамилий или названий на русском, используй их в SQL.
+        5. Ответ должен содержать ТОЛЬКО чистый SQL-запрос, без пояснений и без кавычек.
+
+        ЗАПРОС ПОЛЬЗОВАТЕЛЯ: {user_query}
+        SQL:"""
+
+        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
+        
+        with torch.no_grad():
+            outputs = self.model.generate(
+                **inputs, 
+                max_new_tokens=300, 
+                temperature=0.1, 
+                top_p=0.9
+            )
+        
+        full_response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        
+        # Извлекаем часть после "SQL:"
+        if "SQL:" in full_response:
+            sql = full_response.split("SQL:")[-1].strip()
+        else:
+            sql = full_response.strip()
+
+        # Очистка от мусора
+        sql = sql.replace("```sql", "").replace("```", "").strip()
+        sql = sql.split(';')[0] + ';' # Оставляем только первый запрос до точки с запятой
             
-            # Пробуем LLM если она загружена
+        return sql
+
+    def convert(self, query):
+        """Интерфейс для app.py"""
+        try:
+            print(f"\n🤖 Обработка запроса: '{query}'")
+            
             if self.model_loaded:
-                print("   Использую LLM...")
                 sql = self.generate_sql_with_llm(query)
                 
                 if sql and "SELECT" in sql.upper():
-                    print(f"✅ LLM SQL: {sql}")
+                    print(f"✅ Сгенерирован SQL: {sql}")
                     return {
                         'success': True,
                         'sql_query': sql,
                         'entities': {},
                         'lemmas': []
                     }
-                else:
-                    print("   LLM не сгенерировала SQL, переключаюсь на fallback")
             
-            # Используем fallback
-            print("   Использую улучшенный fallback")
-            sql = self._fallback_sql(query)
-            print(f"✅ Fallback SQL: {sql}")
-            
-            return {
-                'success': True,
-                'sql_query': sql,
-                'entities': {},
-                'lemmas': []
-            }
+            return {'success': False, 'error': "Не удалось создать SQL"}
             
         except Exception as e:
             print(f"❌ Ошибка: {e}")
-            import traceback
-            traceback.print_exc()
-            
-            return {
-                'success': False,
-                'error': str(e),
-                'sql_query': None
-            }
+            return {'success': False, 'error': str(e)}
