@@ -43,13 +43,11 @@ INSERT INTO departments (department_name, department_code, budget, location, pho
 ('Административный отдел', 'ADM', 5000000, 'Москва, ул. Тверская, д.10, 1 этаж', '+7(495)111-11-40', 1),
 ('Департамент дизайна', 'DSN', 6000000, 'Москва, ул. Тверская, д.10, 6 этаж', '+7(495)111-11-50', 1);
 
--- Обновляем руководителей отделов (установим позже, после добавления сотрудников)
 UPDATE departments SET head_of_department_id = (SELECT id FROM employees WHERE position_id = (SELECT id FROM positions WHERE position_name = 'Генеральный директор') LIMIT 1) WHERE department_code = 'EXEC';
 
 -- =====================================================
 -- 3. Заполнение таблицы сотрудников (employees)
 -- =====================================================
--- Сначала добавляем руководителей, потом остальных
 
 -- Генеральный директор
 INSERT INTO employees (first_name, last_name, patronymic, birth_date, gender, email, phone, hire_date, is_active, department_id, position_id, salary, bonus_percent) VALUES
@@ -311,10 +309,7 @@ INSERT INTO job_openings (position_id, department_id, opening_date, closing_date
 ((SELECT id FROM positions WHERE position_name = 'Junior разработчик'), (SELECT id FROM departments WHERE department_code = 'DEV'), '2024-05-15', '2024-07-31', 'OnHold', 70000, 100000, 'Высшее образование, базовые знания', 87),
 ((SELECT id FROM positions WHERE position_name = 'Security специалист'), (SELECT id FROM departments WHERE department_code = 'IT'), '2024-03-10', '2024-06-30', 'Open', 170000, 240000, 'Опыт аудита безопасности', 15);
 
--- =====================================================
--- Дополнительно: обновим manager_id для некоторых сотрудников
--- (чтобы связи были полными)
--- =====================================================
+
 UPDATE employees SET manager_id = (SELECT id FROM employees WHERE email = 'a.volkov@company.ru') WHERE position_id IN (SELECT id FROM positions WHERE position_level IN ('Executive', 'Head'));
 UPDATE employees SET manager_id = (SELECT id FROM employees WHERE email = 'o.krylova@company.ru') WHERE department_id = (SELECT id FROM departments WHERE department_code = 'DEV') AND position_id IN (SELECT id FROM positions WHERE position_name IN ('Senior разработчик', 'Middle разработчик', 'Junior разработчик'));
 

@@ -1,0 +1,146 @@
+﻿id,category,verdict,quality_score,execution_time_sec,generated_sql,error_details
+1,простой,ВЕРНО,100,7.67,SELECT * FROM employees;,"SQL корректен, структура правильная"
+2,простой,ВЕРНО,100,8.02,SELECT DISTINCT department_name FROM departments;,"SQL корректен, структура правильная"
+3,простой,ВЕРНО,100,8.02,SELECT DISTINCT position_name FROM positions;,"SQL корректен, структура правильная"
+4,простой,ВЕРНО,100,7.22,SELECT * FROM projects;,"SQL корректен, структура правильная"
+5,простой,ВЕРНО,100,9.7,SELECT * FROM job_openings WHERE status = 'Open';,"SQL корректен, структура правильная"
+6,простой,ВЕРНО,100,7.26,SELECT * FROM vacations;,"SQL корректен, структура правильная"
+7,простой,ВЕРНО,100,7.4,SELECT * FROM bonuses;,"SQL корректен, структура правильная"
+8,простой,ВЕРНО,100,8.58,SELECT t.training_name FROM trainings t;,"SQL корректен, структура правильная"
+9,простой,ВЕРНО,100,9.34,"SELECT r.rating, r.comments FROM performance_reviews r;","SQL корректен, структура правильная"
+10,простой,ВЕРНО,100,13.79,"SELECT e.first_name, e.last_name FROM employees e JOIN project_assignments pa ON e.id = pa.employee_id;","SQL корректен, структура правильная"
+11,простой,ВЕРНО,100,17.77,"SELECT e.first_name, e.last_name, ph.start_date, ph.end_date, ph.change_reason FROM employees e JOIN employment_history ph ON e.id = ph.employee_id;","SQL корректен, структура правильная"
+12,простой,ВЕРНО,100,12.03,"SELECT first_name, last_name FROM employees WHERE salary > 150000;","SQL корректен, структура правильная"
+13,простой,ВЕРНО,100,10.91,SELECT * FROM employees WHERE salary < 100000;,"SQL корректен, структура правильная"
+14,простой,ВЕРНО,100,8.95,SELECT * FROM employees WHERE is_active = TRUE;,"SQL корректен, структура правильная"
+15,простой,ВЕРНО,100,11.8,"SELECT e.first_name, e.last_name FROM employees e WHERE e.is_active = false;","SQL корректен, структура правильная"
+16,простой,ВЕРНО,100,7.81,SELECT COUNT(*) FROM employees;,"SQL корректен, структура правильная"
+17,простой,ВЕРНО,90,9.76,SELECT COUNT(DISTINCT department_id) FROM employees;,Результаты семантически совпадают
+18,простой,ВЕРНО,100,9.57,SELECT COUNT(*) FROM projects WHERE status = 'Active';,"SQL корректен, структура правильная"
+19,простой,ВЕРНО,100,10.24,SELECT COUNT(*) FROM job_openings WHERE status = 'Open';,"SQL корректен, структура правильная"
+20,простой,ВЕРНО,100,10.14,SELECT COUNT(*) FROM employees WHERE gender = 'Мужской';,"SQL корректен, структура правильная"
+21,простой,ВЕРНО,100,10.3,SELECT COUNT(*) FROM employees WHERE gender = 'Женский';,"SQL корректен, структура правильная"
+22,простой,ВЕРНО,100,15.63,SELECT COUNT(b.id) AS prize_count FROM bonuses b WHERE EXTRACT(YEAR FROM b.bonus_date) = 2024;,"SQL корректен, структура правильная"
+23,простой,ВЕРНО,100,9.38,SELECT COUNT(*) FROM projects WHERE status = 'Completed';,"SQL корректен, структура правильная"
+24,простой,ВЕРНО,100,8.33,SELECT COUNT(*) FROM employee_trainings;,"SQL корректен, структура правильная"
+25,простой,ВЕРНО,100,7.87,SELECT DISTINCT vacation_type FROM vacations;,"SQL корректен, структура правильная"
+26,простой,ВЕРНО,100,10.37,SELECT * FROM employees WHERE last_name ILIKE '%волков%';,"SQL корректен, структура правильная"
+27,простой,ВЕРНО,100,11.09,SELECT * FROM employees WHERE first_name ILIKE '%Екатерина%';,"SQL корректен, структура правильная"
+28,простой,ВЕРНО,100,11.58,SELECT * FROM employees WHERE email LIKE '%a.volkov@company.ru%';,"SQL корректен, структура правильная"
+29,простой,ВЕРНО,100,13.71,SELECT * FROM employees WHERE first_name LIKE '%Смирнов%' OR last_name LIKE '%Смирнов%';,"SQL корректен, структура правильная"
+30,простой,ВЕРНО,100,14.16,SELECT * FROM employees WHERE phone = '+7(916)111-11-11';,"SQL корректен, структура правильная"
+31,простой,Ошибка синтаксиса,0,15.21,SELECT d.department_name FROM departments d JOIN employees e ON d.id = e.department_id WHERE e.position_id LIKE '%Разработка%';,"SQL не выполнился: ОШИБКА:  оператор не существует: integer ~~ unknown
+LINE 1: ...s e ON d.id = e.department_id WHERE e | Ошибка: ОШИБКА:  оператор не существует: integer ~~ unknown
+LINE 1: ...s e ON d.id = e.department_id WHERE e.position_id LIKE '%Раз...
+                       "
+32,простой,Ошибка синтаксиса,0,17.69,SELECT d.department_name FROM departments d JOIN employees e ON d.id = e.department_id WHERE e.position_id LIKE '%IT%' OR e.position_id LIKE '%IT%';,"SQL не выполнился: ОШИБКА:  оператор не существует: integer ~~ unknown
+LINE 1: ...s e ON d.id = e.department_id WHERE e | Ошибка: ОШИБКА:  оператор не существует: integer ~~ unknown
+LINE 1: ...s e ON d.id = e.department_id WHERE e.position_id LIKE '%IT%...
+                       "
+33,простой,ВЕРНО,100,20.21,SELECT p.position_name FROM positions p JOIN employees e ON e.position_id = p.id WHERE p.position_name ILIKE '%Senior%' AND p.category = 'Developer' AND p.position_level = 'Senior';,"SQL корректен, структура правильная"
+34,простой,ВЕРНО,100,12.92,SELECT p.project_name FROM projects p WHERE p.project_name ILIKE '%Мобильное приложение%';,"SQL корректен, структура правильная"
+35,простой,ВЕРНО,100,10.06,SELECT * FROM trainings WHERE training_name LIKE '%SQL%' ;,"SQL корректен, структура правильная"
+36,простой,ВЕРНО,100,18.66,"SELECT e.first_name, e.last_name, AVG(e.salary) AS average_salary FROM employees e GROUP BY e.first_name, e.last_name ORDER BY average_salary DESC LIMIT 5;","SQL корректен, структура правильная"
+37,простой,ВЕРНО,100,16.51,"SELECT e.first_name, e.last_name, MIN(e.salary) AS lowest_salary FROM employees e GROUP BY e.id ORDER BY lowest_salary LIMIT 1;","SQL корректен, структура правильная"
+38,простой,Ошибка синтаксиса,0,20.47,"SELECT e.first_name, e.last_name FROM employees e JOIN employment_history eh ON e.id = eh.employee_id WHERE eh.status = 'Approved' ORDER BY eh.change_date DESC LIMIT 10;","SQL не выполнился: ОШИБКА:  столбец eh.status не существует
+LINE 1: ...loyment_history eh ON e.id = eh.employee_id WHER | Ошибка: ОШИБКА:  столбец eh.status не существует
+LINE 1: ...loyment_history eh ON e.id = eh.employee_id WHERE eh.status ...
+                                  "
+39,простой,ВЕРНО,100,13.03,"SELECT t.training_name, t.cost FROM trainings t ORDER BY t.cost DESC LIMIT 1;","SQL корректен, структура правильная"
+40,простой,ВЕРНО,100,13.12,"SELECT p.project_name, p.budget FROM projects p ORDER BY p.budget DESC LIMIT 1;","SQL корректен, структура правильная"
+41,простой,ВЕРНО,100,28.09,"SELECT e.first_name, e.last_name, b.bonus_amount FROM bonuses b JOIN employees e ON b.employee_id = e.id WHERE b.bonus_date >= '2024-01-01' AND b.bonus_date <= '2024-12-31';","SQL корректен, структура правильная"
+42,простой,ВЕРНО,100,10.37,"SELECT first_name, last_name FROM employees ORDER BY last_name;","SQL корректен, структура правильная"
+43,простой,ВЕРНО,100,8.98,SELECT department_name FROM departments ORDER BY department_name;,"SQL корректен, структура правильная"
+44,простой,ВЕРНО,100,16.46,"SELECT e.first_name, e.last_name FROM employees e JOIN performance_reviews pr ON e.id = pr.employee_id ORDER BY pr.rating DESC LIMIT 1;","SQL корректен, структура правильная"
+45,простой,ВЕРНО,100,25.59,"SELECT e.first_name, e.last_name, v.vacation_type, v.start_date, v.end_date FROM employees e JOIN vacations v ON e.id = v.employee_id WHERE v.status = 'Approved' AND v.start_date >= CURRENT_DATE - INT","SQL корректен, структура правильная"
+46,простой,Частично верно,50,19.46,"SELECT e.first_name, e.last_name FROM employees e JOIN employment_history eh ON e.id = eh.employee_id WHERE EXTRACT(YEAR FROM eh.start_date) = 2023;","Запрос выполнен, но пропущены таблицы: {'HIRE_DATE'}"
+47,простой,Частично верно,50,19.46,"SELECT e.first_name, e.last_name FROM employees e JOIN employment_history eh ON e.id = eh.employee_id WHERE EXTRACT(YEAR FROM eh.start_date) = 2024;","Запрос выполнен, но пропущены таблицы: {'HIRE_DATE'}"
+48,простой,ВЕРНО,90,14.43,"SELECT first_name, last_name FROM employees WHERE TO_CHAR(birth_date, 'YYYY') = '1990';",Результаты семантически совпадают
+49,простой,ВЕРНО,100,38.42,"SELECT e.first_name, e.last_name, b.bonus_amount FROM bonuses b JOIN employees e ON b.employee_id = e.id WHERE b.bonus_date >= DATE_TRUNC('year', CURRENT_DATE) AND b.bonus_date < DATE_TRUNC('quarter',","SQL корректен, структура правильная"
+50,простой,ВЕРНО,100,24.39,"SELECT e.first_name, e.last_name FROM employees e JOIN vacations v ON e.id = v.employee_id WHERE EXTRACT(MONTH FROM v.start_date) = 7 AND EXTRACT(YEAR FROM v.start_date) = 2024;","SQL корректен, структура правильная"
+51,простой,Частично верно,50,16.04,SELECT p.project_name FROM projects p WHERE EXTRACT(YEAR FROM p.start_date) = 2024 AND p.status = 'Planning';,"Запрос выполнен, но пропущены таблицы: {'START_DATE'}"
+52,простой,ВЕРНО,100,15.71,"SELECT * FROM job_openings WHERE status = 'Open' AND TO_CHAR(opening_date, 'YYYY') = '2024';","SQL корректен, структура правильная"
+53,простой,ВЕРНО,100,17.53,"SELECT e.first_name, e.last_name, e.salary FROM employees e WHERE e.salary BETWEEN 100000 AND 200000;","SQL корректен, структура правильная"
+54,простой,ВЕРНО,100,16.18,SELECT p.project_name FROM projects p WHERE p.budget BETWEEN 1000000 AND 3000000;,"SQL корректен, структура правильная"
+55,простой,ВЕРНО,100,9.39,SELECT * FROM performance_reviews WHERE rating = 5;,"SQL корректен, структура правильная"
+56,простой,ВЕРНО,100,8.08,SELECT DISTINCT position_name FROM positions;,"SQL корректен, структура правильная"
+57,простой,ВЕРНО,100,7.97,SELECT DISTINCT vacation_type FROM vacations;,"SQL корректен, структура правильная"
+58,простой,ВЕРНО,100,7.77,SELECT DISTINCT status FROM projects;,"SQL корректен, структура правильная"
+59,простой,ВЕРНО,100,8.46,SELECT DISTINCT training_name FROM trainings;,"SQL корректен, структура правильная"
+60,простой,ВЕРНО,100,14.87,"SELECT e.first_name, e.last_name, d.department_name FROM employees e JOIN departments d ON e.department_id = d.id;","SQL корректен, структура правильная"
+61,простой,ВЕРНО,100,14.77,"SELECT e.first_name, e.last_name, p.position_name FROM employees e JOIN positions p ON e.position_id = p.id;","SQL корректен, структура правильная"
+62,простой,ВЕРНО,100,20.62,"SELECT p.project_name, p.status, p.budget, m.first_name AS manager_first_name, m.last_name AS manager_last_name FROM projects p LEFT JOIN employees m ON p.project_manager_id = m.id;","SQL корректен, структура правильная"
+63,простой,ВЕРНО,100,18.17,"SELECT e.first_name, e.last_name, v.vacation_type, v.start_date, v.end_date FROM employees e JOIN vacations v ON e.id = v.employee_id;","SQL корректен, структура правильная"
+64,простой,ВЕРНО,100,14.83,"SELECT e.first_name, e.last_name, b.bonus_amount FROM bonuses b JOIN employees e ON b.employee_id = e.id;","SQL корректен, структура правильная"
+65,простой,ВЕРНО,100,15.51,"SELECT d.department_name, e.first_name, e.last_name FROM employees e JOIN departments d ON e.id = d.head_of_department_id;","SQL корректен, структура правильная"
+66,простой,ВЕРНО,100,8.28,SELECT MAX(salary) FROM employees;,"SQL корректен, структура правильная"
+67,простой,ВЕРНО,100,8.46,SELECT MIN(salary) FROM employees;,"SQL корректен, структура правильная"
+68,простой,ВЕРНО,100,9.81,SELECT AVG(e.salary) AS average_salary FROM employees e;,"SQL корректен, структура правильная"
+69,простой,ВЕРНО,100,20.95,SELECT SUM(bonus_amount) AS total_bonus FROM bonuses WHERE bonus_date >= '2024-01-01' AND bonus_date < '2025-01-01';,"SQL корректен, структура правильная"
+70,простой,ВЕРНО,100,9.51,SELECT AVG(budget) AS average_budget FROM projects;,"SQL корректен, структура правильная"
+71,средний,ВЕРНО,100,16.39,"SELECT d.department_name, AVG(e.salary) AS average_salary FROM employees e JOIN departments d ON e.department_id = d.id GROUP BY d.department_name;","SQL корректен, структура правильная"
+72,средний,ВЕРНО,100,15.5,"SELECT d.department_name, COUNT(e.id) FROM employees e JOIN departments d ON e.department_id = d.id GROUP BY d.department_name;","SQL корректен, структура правильная"
+73,средний,ВЕРНО,100,16.48,"SELECT d.department_name, SUM(e.salary) AS total_salary FROM employees e JOIN departments d ON e.department_id = d.id GROUP BY d.department_name;","SQL корректен, структура правильная"
+74,средний,ВЕРНО,100,16.55,"SELECT p.position_name, AVG(e.salary) AS average_salary FROM employees e JOIN positions p ON e.position_id = p.id GROUP BY p.position_name;","SQL корректен, структура правильная"
+75,средний,ВЕРНО,100,15.58,"SELECT p.position_name, COUNT(e.id) FROM employees e JOIN positions p ON e.position_id = p.id GROUP BY p.position_name;","SQL корректен, структура правильная"
+76,средний,ВЕРНО,100,21.82,"SELECT e.first_name, e.last_name, SUM(b.bonus_amount) AS total_bonus FROM employees e JOIN bonuses b ON e.id = b.employee_id GROUP BY e.id ORDER BY total_bonus DESC LIMIT 10;","SQL корректен, структура правильная"
+77,средний,ВЕРНО,100,22.05,"SELECT p.position_name, AVG(r.rating) AS average_rating FROM performance_reviews r JOIN employees e ON r.employee_id = e.id JOIN positions p ON e.position_id = p.id GROUP BY p.position_name;","SQL корректен, структура правильная"
+78,средний,ВЕРНО,100,15.82,"SELECT v.vacation_type, COUNT(v.id) AS number_of_vacations FROM vacations v GROUP BY v.vacation_type;","SQL корректен, структура правильная"
+79,средний,ВЕРНО,100,18.21,"SELECT p.project_name, COUNT(p.id) AS number_of_participants FROM projects p JOIN project_assignments pa ON p.id = pa.project_id GROUP BY p.project_name;","SQL корректен, структура правильная"
+80,средний,ВЕРНО,100,19.33,"SELECT e.first_name, e.last_name FROM employees e JOIN vacations v ON e.id = v.employee_id WHERE EXTRACT(YEAR FROM v.start_date) = 2024;","SQL корректен, структура правильная"
+81,средний,ВЕРНО,100,21.33,"SELECT e.first_name, e.last_name FROM employees e JOIN departments d ON e.id = d.head_of_department_id WHERE d.department_name ILIKE '%разработк%' AND e.id = d.head_of_department_id;","SQL корректен, структура правильная"
+82,средний,ВЕРНО,100,22.23,"SELECT d.department_name, AVG(e.salary) AS average_salary FROM employees e JOIN departments d ON e.department_id = d.id GROUP BY d.department_name HAVING AVG(e.salary) > (SELECT AVG(salary) FROM emplo","SQL корректен, структура правильная"
+83,средний,ВЕРНО,100,21.11,"SELECT t.training_name, COUNT(*) AS number_of_participants FROM employee_trainings et JOIN trainings t ON et.training_id = t.id GROUP BY t.training_name ORDER BY COUNT(*) DESC LIMIT 1;","SQL корректен, структура правильная"
+84,средний,Частично верно,50,23.41,"SELECT e.first_name, e.last_name FROM employees e LEFT JOIN vacations v ON e.id = v.employee_id AND EXTRACT(YEAR FROM v.start_date) = 2024 AND v.end_date IS NULL WHERE v.id IS NULL;","Запрос выполнен, но пропущены таблицы: {'START_DATE'}"
+85,средний,ВЕРНО,100,20.3,"SELECT e.id, e.first_name, e.last_name FROM employees e LEFT JOIN employee_trainings et ON e.id = et.employee_id GROUP BY e.id HAVING COUNT(et.id) > 0;","SQL корректен, структура правильная"
+86,средний,Ошибка синтаксиса,0,55.56,"SELECT q.quarter, SUM(b.bonus_amount) AS total_bonus FROM bonuses b JOIN (VALUES (1, 'Q1'), (2, 'Q2'), (3, 'Q3'), (4, 'Q4') AS quarters (quarter, quarter_name)) q ON EXTRACT(YEAR FROM b.bonus_date) = ","SQL не выполнился: ОШИБКА:  ошибка синтаксиса (примерное положение: ""AS"")
+LINE 1: ...VALUES (1, 'Q1'), (2, 'Q2'), (3, ' | Ошибка: ОШИБКА:  ошибка синтаксиса (примерное положение: ""AS"")
+LINE 1: ...VALUES (1, 'Q1'), (2, 'Q2'), (3, 'Q3'), (4, 'Q4') AS quarter...
+                    "
+87,средний,ВЕРНО,100,14.38,"SELECT p.project_name, p.budget FROM projects p WHERE p.budget > (SELECT AVG(budget) FROM projects);","SQL корректен, структура правильная"
+88,средний,Ошибка синтаксиса,0,26.48,"SELECT e.first_name, e.last_name, AVG(e.salary) AS avg_salary FROM employees e JOIN departments d ON e.department_id = d.id GROUP BY e.id, e.first_name, e.last_name HAVING e.salary > AVG(e.salary) OVE","SQL не выполнился: ОШИБКА:  оконные функции нельзя применять в конструкции HAVING
+LINE 1: ...e.id, e.first_name, e.last | Ошибка: ОШИБКА:  оконные функции нельзя применять в конструкции HAVING
+LINE 1: ...e.id, e.first_name, e.last_name HAVING e.salary > AVG(e.sala...
+            "
+89,средний,ВЕРНО,100,20.33,"SELECT d.department_name, COUNT(p.id) AS project_count FROM projects p JOIN departments d ON p.department_id = d.id WHERE p.status IN ('Active', 'Completed') GROUP BY d.department_name;","SQL корректен, структура правильная"
+90,средний,Ошибка синтаксиса,0,30.79,"SELECT v.vacation_type, AVG(j.duration) AS average_duration FROM vacations v JOIN (
+    SELECT employee_id, MAX(start_date) - MIN(end_date) AS duration FROM vacations GROUP BY employee_id
+) j ON v.emp","SQL не выполнился: ОШИБКА:  столбец j.start_date не существует
+LINE 3: ... v.employee_id = j.employee_id AND v.start_da | Ошибка: ОШИБКА:  столбец j.start_date не существует
+LINE 3: ... v.employee_id = j.employee_id AND v.start_date = j.start_da...
+                               "
+91,сложный,Частично верно,50,17.96,"SELECT d.department_name, e.first_name, e.last_name, e.salary FROM employees e JOIN departments d ON e.department_id = d.id ORDER BY e.salary DESC;","Запрос выполнен, но отсутствует фильтрация"
+92,сложный,Ошибка синтаксиса,0,67.35,"SELECT 
+    e.first_name AS EmployeeFirstName,
+    e.salary AS EmployeeSalary,
+    COALESCE(avg_company_salary.avg_salary, 0) AS AverageCompanySalary,
+    COALESCE(avg_department_salary.avg_salary, 0)","SQL не выполнился: ОШИБКА:  ошибка синтаксиса (примерное положение: ""WHERE"")
+LINE 25: WHERE 
+         ^
+ | Ошибка: ОШИБКА:  ошибка синтаксиса (примерное положение: ""WHERE"")
+LINE 25: WHERE 
+         ^
+"
+93,сложный,Частично верно,50,28.46,"SELECT e1.first_name AS supervisor_first_name, e1.last_name AS supervisor_last_name, e2.first_name AS subordinate_first_name, e2.last_name AS subordinate_last_name FROM employees e1 JOIN employees e2 ","Запрос выполнен, но отсутствует фильтрация"
+94,сложный,ВЕРНО,100,25.32,"SELECT e.first_name, e.last_name FROM employees e JOIN bonuses b ON e.id = b.employee_id JOIN vacations v ON e.id = v.employee_id WHERE EXTRACT(MONTH FROM b.bonus_date) = EXTRACT(MONTH FROM v.start_da","SQL корректен, структура правильная"
+95,сложный,ВЕРНО,100,37.62,"SELECT EXTRACT(YEAR FROM termination_date) AS year, EXTRACT(MONTH FROM termination_date) AS month, COUNT(*) AS dismissals_count
+FROM employees
+WHERE termination_date >= DATE('2023-01-01') AND terminat","SQL корректен, структура правильная"
+96,сложный,ВЕРНО,100,31.32,"SELECT p.project_name, p.budget FROM projects p LEFT JOIN (
+    SELECT ta.project_id, SUM(e.salary) as total_salary
+    FROM employees e JOIN project_assignments ta ON e.id = ta.employee_id
+    GROUP ","SQL корректен, структура правильная"
+97,сложный,НЕ ПОНЯЛ,0,21.81,"SELECT d.department_name FROM departments d JOIN employees e ON d.id = e.department_id WHERE e.is_active = TRUE AND EXISTS (
+    SELECT 1 FROM employee_trainings et WHERE et.employee_id = e.id
+);",Модель не смогла интерпретировать запрос
+98,сложный,Ошибка синтаксиса,0,32.1,"SELECT e.first_name, e.last_name, MAX(e.salary) OVER (PARTITION BY e.id ORDER BY e.hire_date DESC) AS current_salary, MIN(e.salary) OVER (PARTITION BY e.id ORDER BY e.hire_date) AS initial_salary
+FROM","SQL не выполнился: ОШИБКА:  столбец e.current_salary не существует
+LINE 3: WHERE e.current_salary > e.initial_salary *  | Ошибка: ОШИБКА:  столбец e.current_salary не существует
+LINE 3: WHERE e.current_salary > e.initial_salary * 1.3;
+              ^
+"
+99,сложный,ВЕРНО,100,31.77,"SELECT e.first_name, e.last_name, SUM(p.budget) AS total_budget FROM employees e JOIN project_assignments pa ON e.id = pa.employee_id JOIN projects p ON pa.project_id = p.id GROUP BY e.id, e.first_nam","SQL корректен, структура правильная"
+100,сложный,ВЕРНО,100,33.83,"SELECT EXTRACT(YEAR FROM b.bonus_date), EXTRACT(MONTH FROM b.bonus_date), SUM(b.bonus_amount) AS cumulative_bonus
+FROM bonuses b
+WHERE EXTRACT(YEAR FROM b.bonus_date) = 2024
+GROUP BY EXTRACT(YEAR FROM","SQL корректен, структура правильная"

@@ -554,4 +554,49 @@ tr:hover {
     .quick-actions {
         flex-direction: column;
     }
+
+    .clarification-box {
+        background: #fef3c7;
+        border: 1px solid #f59e0b;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 10px 0;
+    }
+
+    .clarification-box p {
+        margin: 10px 0;
+        color: #92400e;
+    }
+
+    .clarification-box ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .clarification-box li {
+        padding: 10px 15px;
+        background: white;
+        border-radius: 8px;
+        margin: 8px 0;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #1e40af;
+    }
+
+    .clarification-box li:hover {
+        background: #eff6ff;
+        transform: translateX(5px);
+    }
+
+    .clarification-box li i {
+        margin-right: 10px;
+        color: #f59e0b;
+    }
+
+    .history-empty {
+        color: #94a3b8;
+        text-align: center;
+        padding: 20px;
+        font-style: italic;
+    }
 }

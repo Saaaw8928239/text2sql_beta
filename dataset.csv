@@ -1,0 +1,101 @@
+﻿id,nl_query,category,expected_sql
+1,Покажи всех сотрудников,простой,SELECT * FROM employees;
+2,Выведи список всех отделов,простой,SELECT * FROM departments;
+3,Показать все должности в компании,простой,SELECT * FROM positions;
+4,Список всех проектов,простой,SELECT * FROM projects;
+5,Какие есть вакансии,простой,SELECT * FROM job_openings;
+6,Показать все отпуска,простой,SELECT * FROM vacations;
+7,Список всех премий,простой,SELECT * FROM bonuses;
+8,Какие тренинги проводились,простой,SELECT * FROM trainings;
+9,Показать оценки сотрудников,простой,SELECT * FROM performance_reviews;
+10,Кто участвует в проектах,простой,SELECT * FROM project_assignments;
+11,История трудоустройства сотрудников,простой,SELECT * FROM employment_history;
+12,Показать сотрудников с зарплатой больше 150000,простой,SELECT * FROM employees WHERE salary > 150000;
+13,Сотрудники с зарплатой меньше 100000,простой,SELECT * FROM employees WHERE salary < 100000;
+14,Активные сотрудники,простой,SELECT * FROM employees WHERE is_active = true;
+15,Уволенные сотрудники,простой,SELECT * FROM employees WHERE is_active = false;
+16,Сколько всего сотрудников,простой,SELECT COUNT(*) FROM employees;
+17,Сколько отделов в компании,простой,SELECT COUNT(*) FROM departments;
+18,Сколько проектов в работе,простой,SELECT COUNT(*) FROM projects WHERE status = 'Active';
+19,Количество открытых вакансий,простой,SELECT COUNT(*) FROM job_openings WHERE status = 'Open';
+20,Сколько сотрудников-мужчин,простой,SELECT COUNT(*) FROM employees WHERE gender = 'Мужской';
+21,Сколько сотрудников-женщин,простой,SELECT COUNT(*) FROM employees WHERE gender = 'Женский';
+22,Сколько премий выплачено в 2024 году,простой,SELECT COUNT(*) FROM bonuses WHERE year = 2024;
+23,Количество завершённых проектов,простой,SELECT COUNT(*) FROM projects WHERE status = 'Completed';
+24,Сколько сотрудников прошло обучение,простой,SELECT COUNT(DISTINCT employee_id) FROM employee_trainings;
+25,Сколько типов отпусков существует,простой,SELECT COUNT(DISTINCT vacation_type) FROM vacations;
+26,Найти сотрудника с фамилией Волков,простой,SELECT * FROM employees WHERE last_name ILIKE '%волков%';
+27,Найти сотрудника с именем Екатерина,простой,SELECT * FROM employees WHERE first_name ILIKE '%екатерина%';
+28,Показать сотрудника с email a.volkov@company.ru,простой,SELECT * FROM employees WHERE email = 'a.volkov@company.ru';
+29,Найти всех Смирновых,простой,SELECT * FROM employees WHERE last_name ILIKE '%смирнов%';
+30,Показать сотрудника с телефоном +7(916)111-11-11,простой,SELECT * FROM employees WHERE phone = '+7(916)111-11-11';
+31,Найти отдел разработки,простой,SELECT * FROM departments WHERE department_name ILIKE '%разработк%';
+32,Показать IT-департамент,простой,SELECT * FROM departments WHERE department_code = 'IT';
+33,Найти должность Senior разработчика,простой,SELECT * FROM positions WHERE position_name = 'Senior разработчик';
+34,Показать проект Мобильное приложение,простой,SELECT * FROM projects WHERE project_name ILIKE '%мобильное%';
+35,Найти тренинг по SQL,простой,SELECT * FROM trainings WHERE training_name ILIKE '%sql%';
+36,Топ 5 сотрудников по зарплате,простой,"SELECT first_name, last_name, salary FROM employees ORDER BY salary DESC LIMIT 5;"
+37,Самые низкооплачиваемые сотрудники,простой,"SELECT first_name, last_name, salary FROM employees ORDER BY salary ASC LIMIT 5;"
+38,Последние 10 принятых сотрудников,простой,SELECT * FROM employees ORDER BY hire_date DESC LIMIT 10;
+39,Самые дорогие тренинги,простой,"SELECT training_name, cost FROM trainings ORDER BY cost DESC LIMIT 5;"
+40,Проекты с наибольшим бюджетом,простой,"SELECT project_name, budget FROM projects ORDER BY budget DESC LIMIT 5;"
+41,Самые большие премии в 2024 году,простой,SELECT * FROM bonuses WHERE year = 2024 ORDER BY bonus_amount DESC LIMIT 5;
+42,Сотрудники отсортированные по фамилии,простой,SELECT * FROM employees ORDER BY last_name;
+43,Отделы по алфавиту,простой,SELECT department_name FROM departments ORDER BY department_name;
+44,Сотрудники с самой высокой оценкой,простой,SELECT * FROM performance_reviews ORDER BY rating DESC LIMIT 10;
+45,Недавние отпуска,простой,SELECT * FROM vacations ORDER BY start_date DESC LIMIT 10;
+46,Кто был принят на работу в 2023 году,простой,SELECT * FROM employees WHERE EXTRACT(YEAR FROM hire_date) = 2023;
+47,"Сотрудники, принятые в 2024 году",простой,SELECT * FROM employees WHERE EXTRACT(YEAR FROM hire_date) = 2024;
+48,Кто родился в 1990 году,простой,SELECT * FROM employees WHERE EXTRACT(YEAR FROM birth_date) = 1990;
+49,Премии за 1 квартал 2024 года,простой,SELECT * FROM bonuses WHERE quarter = 1 AND year = 2024;
+50,Отпуска в июле 2024,простой,SELECT * FROM vacations WHERE start_date BETWEEN '2024-07-01' AND '2024-07-31';
+51,Проекты начатые в 2024 году,простой,SELECT * FROM projects WHERE EXTRACT(YEAR FROM start_date) = 2024;
+52,Вакансии открытые в 2024,простой,SELECT * FROM job_openings WHERE status = 'Open' AND opening_date >= '2024-01-01';
+53,Сотрудники с зарплатой от 100000 до 200000,простой,SELECT * FROM employees WHERE salary BETWEEN 100000 AND 200000;
+54,Проекты с бюджетом от 1 до 3 миллионов,простой,SELECT * FROM projects WHERE budget BETWEEN 1000000 AND 3000000;
+55,Оценки 5 (отлично),простой,SELECT * FROM performance_reviews WHERE rating = 5;
+56,Какие уникальные должности есть,простой,SELECT DISTINCT position_name FROM positions;
+57,Какие типы отпусков бывают,простой,SELECT DISTINCT vacation_type FROM vacations;
+58,Какие статусы проектов существуют,простой,SELECT DISTINCT status FROM projects;
+59,Какие типы тренингов проводятся,простой,SELECT DISTINCT training_type FROM trainings;
+60,Сотрудники и их отделы,простой,"SELECT e.first_name, e.last_name, d.department_name FROM employees e JOIN departments d ON e.department_id = d.id;"
+61,Сотрудники и их должности,простой,"SELECT e.first_name, e.last_name, p.position_name FROM employees e JOIN positions p ON e.position_id = p.id;"
+62,Проекты и менеджеры проектов,простой,"SELECT p.project_name, CONCAT(e.first_name, ' ', e.last_name) as manager FROM projects p LEFT JOIN employees e ON p.project_manager_id = e.id;"
+63,Отпуска с именами сотрудников,простой,"SELECT v.*, e.first_name, e.last_name FROM vacations v JOIN employees e ON v.employee_id = e.id;"
+64,Премии с именами сотрудников,простой,"SELECT b.*, e.first_name, e.last_name FROM bonuses b JOIN employees e ON b.employee_id = e.id;"
+65,Кто руководит отделами,простой,"SELECT d.department_name, CONCAT(e.first_name, ' ', e.last_name) as head FROM departments d LEFT JOIN employees e ON d.head_of_department_id = e.id;"
+66,Максимальная зарплата в компании,простой,SELECT MAX(salary) FROM employees;
+67,Минимальная зарплата,простой,SELECT MIN(salary) FROM employees;
+68,Средняя зарплата по компании,простой,SELECT AVG(salary) FROM employees;
+69,Сумма всех премий за 2024 год,простой,SELECT SUM(bonus_amount) FROM bonuses WHERE year = 2024;
+70,Средний бюджет проектов,простой,SELECT AVG(budget) FROM projects;
+71,Средняя зарплата по отделам,средний,"SELECT d.department_name, ROUND(AVG(e.salary), 2) as avg_salary FROM employees e JOIN departments d ON e.department_id = d.id GROUP BY d.department_name ORDER BY avg_salary DESC;"
+72,Сколько сотрудников в каждом отделе,средний,"SELECT d.department_name, COUNT(e.id) as emp_count FROM employees e JOIN departments d ON e.department_id = d.id GROUP BY d.department_name ORDER BY emp_count DESC;"
+73,Сумма зарплат по отделам (фонд оплаты труда),средний,"SELECT d.department_name, SUM(e.salary) as total_salary FROM employees e JOIN departments d ON e.department_id = d.id GROUP BY d.department_name ORDER BY total_salary DESC;"
+74,Средняя зарплата по должностям,средний,"SELECT p.position_name, ROUND(AVG(e.salary), 2) as avg_salary FROM employees e JOIN positions p ON e.position_id = p.id GROUP BY p.position_name ORDER BY avg_salary DESC;"
+75,Количество сотрудников на каждой должности,средний,"SELECT p.position_name, COUNT(e.id) as emp_count FROM employees e JOIN positions p ON e.position_id = p.id GROUP BY p.position_name ORDER BY emp_count DESC;"
+76,Топ-10 сотрудников по сумме полученных премий,средний,"SELECT e.first_name, e.last_name, SUM(b.bonus_amount) as total_bonus FROM employees e JOIN bonuses b ON e.id = b.employee_id GROUP BY e.id ORDER BY total_bonus DESC LIMIT 10;"
+77,Средняя оценка сотрудников по отзывам,средний,"SELECT e.first_name, e.last_name, ROUND(AVG(pr.rating), 2) as avg_rating FROM employees e JOIN performance_reviews pr ON e.id = pr.employee_id GROUP BY e.id ORDER BY avg_rating DESC;"
+78,Количество отпусков по типам,средний,"SELECT vacation_type, COUNT(*) as count FROM vacations GROUP BY vacation_type ORDER BY count DESC;"
+79,Проекты и количество участников,средний,"SELECT p.project_name, COUNT(pa.employee_id) as members FROM projects p LEFT JOIN project_assignments pa ON p.id = pa.project_id GROUP BY p.id ORDER BY members DESC;"
+80,"Сотрудники, которые были в отпуске в 2024 году",средний,"SELECT DISTINCT e.first_name, e.last_name FROM employees e JOIN vacations v ON e.id = v.employee_id WHERE EXTRACT(YEAR FROM v.start_date) = 2024;"
+81,Кто руководит отделом разработки,средний,"SELECT CONCAT(e.first_name, ' ', e.last_name) as head FROM employees e JOIN departments d ON e.id = d.head_of_department_id WHERE d.department_name ILIKE '%разработк%';"
+82,"Отделы, где средняя зарплата выше обще公司ной",средний,"SELECT d.department_name, ROUND(AVG(e.salary), 2) as avg_salary FROM employees e JOIN departments d ON e.department_id = d.id GROUP BY d.department_name HAVING AVG(e.salary) > (SELECT AVG(salary) FROM employees);"
+83,Самые популярные тренинги,средний,"SELECT t.training_name, COUNT(et.employee_id) as participants FROM trainings t JOIN employee_trainings et ON t.id = et.training_id GROUP BY t.id ORDER BY participants DESC LIMIT 5;"
+84,Сотрудники без отпусков в 2024 году,средний,"SELECT e.first_name, e.last_name FROM employees e WHERE e.id NOT IN (SELECT employee_id FROM vacations WHERE EXTRACT(YEAR FROM start_date) = 2024) AND e.is_active = true;"
+85,"Сотрудники, прошедшие хотя бы один тренинг",средний,"SELECT DISTINCT e.first_name, e.last_name, COUNT(et.training_id) as trainings_count FROM employees e JOIN employee_trainings et ON e.id = et.employee_id GROUP BY e.id ORDER BY trainings_count DESC;"
+86,Сумма премий по кварталам 2024 года,средний,"SELECT quarter, SUM(bonus_amount) as total_bonus FROM bonuses WHERE year = 2024 GROUP BY quarter ORDER BY quarter;"
+87,"Проекты, бюджет которых выше среднего",средний,"SELECT project_name, budget FROM projects WHERE budget > (SELECT AVG(budget) FROM projects) ORDER BY budget DESC;"
+88,"Сотрудники, у которых зарплата выше средней по их отделу",средний,"SELECT e.first_name, e.last_name, e.salary, d.department_name FROM employees e JOIN departments d ON e.department_id = d.id WHERE e.salary > (SELECT AVG(salary) FROM employees WHERE department_id = e.department_id);"
+89,Количество завершённых и активных проектов по отделам,средний,"SELECT d.department_name, COUNT(CASE WHEN p.status = 'Active' THEN 1 END) as active, COUNT(CASE WHEN p.status = 'Completed' THEN 1 END) as completed FROM departments d LEFT JOIN projects p ON d.id = p.department_id GROUP BY d.department_name;"
+90,Средняя продолжительность отпуска по типам,средний,"SELECT vacation_type, ROUND(AVG(end_date - start_date), 1) as avg_days FROM vacations WHERE status = 'Approved' GROUP BY vacation_type;"
+91,Ранжирование сотрудников по зарплате в каждом отделе,сложный,"SELECT e.first_name, e.last_name, d.department_name, e.salary, RANK() OVER (PARTITION BY e.department_id ORDER BY e.salary DESC) as rank_in_dept FROM employees e JOIN departments d ON e.department_id = d.id WHERE e.is_active = true;"
+92,Сравнение зарплаты сотрудника со средней по компании и по отделу,сложный,"SELECT e.first_name, e.last_name, e.salary, ROUND(AVG(e.salary) OVER(), 2) as company_avg, ROUND(AVG(e.salary) OVER(PARTITION BY department_id), 2) as dept_avg, ROUND(e.salary - AVG(e.salary) OVER(), 2) as diff_from_company FROM employees e WHERE e.is_active = true LIMIT 20;"
+93,Иерархия подчинения сотрудников,сложный,"WITH RECURSIVE emp_tree AS (SELECT id, first_name, last_name, manager_id, 1 as level FROM employees WHERE manager_id IS NULL UNION ALL SELECT e.id, e.first_name, e.last_name, e.manager_id, et.level + 1 FROM employees e JOIN emp_tree et ON e.manager_id = et.id) SELECT id, first_name, last_name, level FROM emp_tree ORDER BY level, last_name;"
+94,"Сотрудники, которые получали премию и были в отпуске в одном месяце",сложный,"SELECT DISTINCT e.first_name, e.last_name FROM employees e JOIN vacations v ON e.id = v.employee_id JOIN bonuses b ON e.id = b.employee_id WHERE EXTRACT(YEAR FROM v.start_date) = EXTRACT(YEAR FROM b.bonus_date) AND EXTRACT(MONTH FROM v.start_date) = EXTRACT(MONTH FROM b.bonus_date) AND b.year = 2024;"
+95,Текучесть кадров по месяцам (увольнения за 2023-2024),сложный,"SELECT EXTRACT(YEAR FROM termination_date) as year, EXTRACT(MONTH FROM termination_date) as month, COUNT(*) as terminated FROM employees WHERE termination_date IS NOT NULL AND EXTRACT(YEAR FROM termination_date) >= 2023 GROUP BY year, month ORDER BY year, month;"
+96,"Проекты, где бюджет превышает суммарные зарплаты всех участников",сложный,"SELECT p.project_name, p.budget, COALESCE(SUM(e.salary), 0) as total_salaries FROM projects p LEFT JOIN project_assignments pa ON p.id = pa.project_id LEFT JOIN employees e ON pa.employee_id = e.id GROUP BY p.id HAVING p.budget > COALESCE(SUM(e.salary), 0);"
+97,"Отделы, где все активные сотрудники прошли хотя бы один тренинг",сложный,SELECT d.department_name FROM departments d WHERE NOT EXISTS (SELECT 1 FROM employees e WHERE e.department_id = d.id AND e.is_active = true AND e.id NOT IN (SELECT employee_id FROM employee_trainings));
+98,"Сотрудники, чья зарплата выросла более чем на 30% за время работы",сложный,"SELECT e.first_name, e.last_name, MIN(eh.salary) as start_salary, MAX(eh.salary) as current_salary, ROUND(((MAX(eh.salary) - MIN(eh.salary)) / MIN(eh.salary) * 100), 1) as growth_percent FROM employees e JOIN employment_history eh ON e.id = eh.employee_id GROUP BY e.id HAVING (MAX(eh.salary) - MIN(eh.salary)) / MIN(eh.salary) > 0.3;"
+99,"Сотрудники, которые участвуют в проектах, суммарный бюджет которых превышает 5 млн",сложный,"SELECT e.first_name, e.last_name, SUM(p.budget) as total_budget, COUNT(DISTINCT p.id) as project_count FROM employees e JOIN project_assignments pa ON e.id = pa.employee_id JOIN projects p ON pa.project_id = p.id GROUP BY e.id HAVING SUM(p.budget) > 5000000 ORDER BY total_budget DESC;"
+100,Кумулятивная сумма премий по месяцам в 2024 году,сложный,"SELECT DATE_TRUNC('month', bonus_date) as month, SUM(bonus_amount) as monthly_bonus, SUM(SUM(bonus_amount)) OVER (ORDER BY DATE_TRUNC('month', bonus_date)) as cumulative_bonus FROM bonuses WHERE year = 2024 GROUP BY month ORDER BY month;"

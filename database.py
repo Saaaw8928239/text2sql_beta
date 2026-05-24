@@ -18,10 +18,10 @@ class Database:
                 password=config.DB_PASSWORD
             )
             self.cursor = self.connection.cursor()
-            print("✅ Подключение к PostgreSQL установлено успешно.")
+            print("Подключение к PostgreSQL установлено успешно.")
             return True
         except Exception as e:
-            print(f"❌ Ошибка подключения к БД: {e}")
+            print(f"Ошибка подключения к БД: {e}")
             return False
     
     def disconnect(self):
@@ -35,19 +35,26 @@ class Database:
     def execute_query(self, query, params=None, fetch=True):
         """Выполнение SQL-запроса с возвратом данных и имен колонок"""
         try:
+
+            clean_query = query.strip()
+            upper_query = clean_query.upper()
+            
             if params:
-                self.cursor.execute(query, params)
+                self.cursor.execute(clean_query, params)
             else:
-                self.cursor.execute(query)
+                self.cursor.execute(clean_query)
             
             if fetch:
-                # Проверяем, является ли запрос выборкой данных
-                upper_query = query.strip().upper()
                 if upper_query.startswith('SELECT') or upper_query.startswith('WITH'):
-                    # Извлекаем имена колонок для корректного отображения в таблице на фронтенде
-                    columns = [desc[0] for desc in self.cursor.description]
-                    results = self.cursor.fetchall()
-                    return results, columns
+                    if self.cursor.description:
+                        columns = [desc[0] for desc in self.cursor.description]
+                        results = self.cursor.fetchall()
+                        
+                        print(f"SQL выполнен. Найдено строк: {len(results)}")
+                        
+                        return results, columns
+                    else:
+                        return [], []
                 else:
                     self.connection.commit()
                     return self.cursor.rowcount, None
@@ -58,11 +65,11 @@ class Database:
         except DatabaseError as e:
             if self.connection:
                 self.connection.rollback()
-            print(f"❌ Ошибка выполнения запроса: {e}")
+            print(f"Ошибка выполнения запроса: {e}")
             raise e
     
     def get_table_structure(self, table_name):
-        """Получение структуры конкретной таблицы (колонки, типы данных)"""
+        """Получение структуры конкретной таблицы"""
         query = """
         SELECT column_name, data_type, is_nullable
         FROM information_schema.columns
@@ -73,10 +80,7 @@ class Database:
         return self.cursor.fetchall()
 
     def get_all_tables_metadata(self):
-        """
-        Получение метаданных всех таблиц HR-системы.
-        Используется для формирования контекста (промпта) нейросети.
-        """
+        """Получение метаданных всех таблиц для формирования промпта LLM"""
         query = """
         SELECT table_name, column_name, data_type 
         FROM information_schema.columns 
@@ -91,24 +95,18 @@ class Database:
         results, _ = self.execute_query(query)
         return results
 
-# Создаем глобальный экземпляр для использования в приложении
 db = Database()
 
 def init_db():
     """Инициализация БД при запуске приложения"""
     if db.connect():
         try:
-            # Проверка наличия таблиц в схеме
-            tables_query = """
-                SELECT count(*) 
-                FROM information_schema.tables 
-                WHERE table_schema = 'public';
-            """
+            tables_query = "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public';"
             result, _ = db.execute_query(tables_query)
             table_count = result[0][0]
-            print(f"📊 В схеме 'public' обнаружено таблиц: {table_count}")
+            print(f"В схеме 'public' обнаружено таблиц: {table_count}")
             return True
         except Exception as e:
-            print(f"⚠️ Ошибка при проверке таблиц: {e}")
-            return True # Все равно возвращаем True, если соединение есть
+            print(f"Ошибка при проверке таблиц: {e}")
+            return True 
     return False
