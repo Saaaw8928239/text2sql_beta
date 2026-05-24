@@ -6,7 +6,7 @@
 
 ---
 
-## 🎯 О проекте
+## О проекте
 
 **Text2SQL HR** — это интеллектуальная система, позволяющая сотрудникам отдела кадров задавать вопросы к базе данных **на обычном русском языке**, а не на SQL.
 
@@ -18,7 +18,7 @@
 
 ---
 
-## ✨ Основные возможности
+## Основные возможности
 
 - **Полностью на русском языке** — запросы формулируются естественно
 - **Мощная LLM** — Qwen2.5-3B-Instruct (4-битная квантованная версия)
@@ -31,7 +31,7 @@
 
 ---
 
-## 🛠 Технологический стек
+## Технологический стек
 
 - **Backend**: Python + Flask
 - **LLM**: Qwen/Qwen2.5-3B-Instruct (BitsAndBytes 4-bit)
@@ -42,40 +42,63 @@
 
 ---
 
-## 🚀 Быстрый запуск
+## Запуск
 
 ### 1. Клонирование репозитория
-```bash
+
+```
 git clone https://github.com/Saaaw8928239/text2sql_beta.git
 cd text2sql_beta
-2. Создание и активация виртуального окружения
-Bashpython -m venv venv
+```
+
+### 2. Создание и активация виртуального окружения
+
+```
+python -m venv venv
 # Windows:
 venv\Scripts\activate
 # Linux/Mac:
 # source venv/bin/activate
-3. Установка зависимостей
-Bashpip install -r requirements.txt
-4. Настройка базы данных
+```
+
+### 3. Установка зависимостей
+
+```
+pip install -r requirements.txt
+```
+
+### 4. Настройка базы данных
 
 Создайте базу company_db
-Выполните скрипты:Bashpsql -U postgres -d company_db -f create_db.sql
-psql -U postgres -d company_db -f insert_test_data.sql
+Выполните скрипты:
 
-5. Настройка переменных окружения
+```
+psql -U postgres -d company_db -f create_db.sql
+psql -U postgres -d company_db -f insert_test_data.sql
+```
+
+### 5. Настройка переменных окружения
+
 Создайте файл .env:
-envDB_HOST=localhost
+
+```
+DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=company_db
 DB_USER=postgres
 DB_PASSWORD=твой_пароль
 
 SECRET_KEY=super-secret-key-2026
-6. Запуск
-Bashpython app.py
-Перейдите в браузере: http://localhost:5000
+```
 
-📁 Структура проекта
+### 6. Запуск
+
+```
+python app.py
+Перейдите в браузере: http://localhost:5000
+```
+
+### Структура проекта
 texttext2sql_beta/
 ├── app.py                    # Основное Flask-приложение
 ├── llm_sql_converter.py      # Ядро LLM + генерация SQL
@@ -89,7 +112,7 @@ texttext2sql_beta/
 ├── static/                   # CSS, JS
 └── query_history.json        # История запросов
 
-📊 Результаты тестирования
+### Результаты тестирования
 
 Общая точность: 92%
 Простые запросы: 96.7%
@@ -97,15 +120,9 @@ texttext2sql_beta/
 Сложные запросы: 70%
 
 
-🔒 Безопасность
+### Безопасность
 
 Запрещены все операции модификации данных
 Двухуровневая проверка (на естественном языке + SQL)
 Параметризованные запросы
 Полная локальная работа с данными
-
-
-📄 Документация
-
-Полный текст дипломной работы — в файле Бахарев_В_М_ИТ406.docx
-Отчёт по тестированию — final_test_report_smart.csv
