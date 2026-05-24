@@ -99,6 +99,7 @@ python app.py
 ```
 
 ### Структура проекта
+```
 texttext2sql_beta/
 ├── app.py                    # Основное Flask-приложение
 ├── llm_sql_converter.py      # Ядро LLM + генерация SQL
@@ -111,6 +112,7 @@ texttext2sql_beta/
 ├── templates/index.html      # Веб-интерфейс
 ├── static/                   # CSS, JS
 └── query_history.json        # История запросов
+```
 
 ### Результаты тестирования
 
